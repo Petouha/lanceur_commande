@@ -33,7 +33,7 @@ conso: conso.o file.o
 daemon: daemon.o file.o
 	$(CC) -o $@ $^ $(CFLAGS)
 
-nsiyi: nsiyi.o file.o
+nsiyi: nsiyi.o file.o analyse.o
 	$(CC) -o $@ $^ $(CFLAGS)
 
 
