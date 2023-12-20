@@ -111,3 +111,34 @@ char *create_string(int pid_proc, int tube){
     return return_value;
 }
 
+char **get_command_string(char **argv){
+    char **anal;
+    char result[MAX_STRING_LENGTH] = "";
+    // pour séparer les commandes
+    char **split_components = malloc(MAX_COMPONENTS * sizeof(char *));  // pour retourner le tableau
+
+    if (split_components == NULL)
+        errExit("malloc");
+    anal = analyse_arg(argv[1]);
+
+    // concaténer le resultat de l'analyse dans une variable
+    for (int i = 0; anal[i] != NULL; ++i) {
+        strcat(result, anal[i]);
+        strcat(result, " ");
+    }
+
+    printf("Full result: %s\n", result);
+
+    // séparer les commandes par |
+    char *parcours = strtok(result, "|");
+    int i = 0;
+
+    while (parcours != NULL && i < MAX_COMPONENTS) {
+        split_components[i] = strdup(parcours);  // Store a copy of the component
+        parcours = strtok(NULL, "|");
+        i++;
+    }
+
+
+    return  split_components;
+}

@@ -15,7 +15,8 @@
 #define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); \
                                    } while (0)
 
-
+#define MAX_STRING_LENGTH 1024
+#define MAX_COMPONENTS 100
 #define TAILLE_FILE 5
 #define NOM_SHM "/shm_file"
 #define BUFF_TAILLE 1024
@@ -44,3 +45,5 @@ char *create_string(int pid_proc, int tube);
 
 char **analyse_arg(const char arg[]);
 void dispose_arg(char *argv[]);
+
+char **get_command_string(char **argv);

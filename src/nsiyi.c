@@ -4,18 +4,34 @@
 
 #include "../include/file.h"
 
+int array_length(char **arr) {
+    int length = 0;
+
+    while (arr[length] != NULL) {
+        length++;
+    }
+
+    return length;
+}
+
+
 int main(int argc, char **argv){
 
     if (argc < 2){
         fprintf(stderr,"Pas assez d'arguments\n");
         exit(EXIT_FAILURE);
     }
-    char ** anal = analyse_arg(*argv);
-    int i=0;
-    while (anal != NULL){
-        printf("%s\n",anal[i]);
-        i++;
-        anal+=sizeof(anal[i]);
+
+    for (int i = 0; i < argc; ++i) {
+        printf("%s\n",argv[i]);
+    }
+
+    char **print = get_command_string(argv);
+
+//    int tubes[array_length(print)][2];
+
+    for (int j = 0; array_length(print); ++j) {
+
     }
 
 //    char *fifo_in = create_string(getpid(),STDIN_FILENO);
@@ -79,3 +95,4 @@ int main(int argc, char **argv){
 
 
 }
+
