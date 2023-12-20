@@ -3,8 +3,8 @@
 
 int main(int argc, char **argv){
 
-    if (argc < 2){
-        fprintf(stderr,"Pas assez d'arguments\n");
+    if (argc != 2){
+        fprintf(stderr,"Veuillez entrer une string avec des \" \" \n");
         exit(EXIT_FAILURE);
     }
 
@@ -29,14 +29,9 @@ int main(int argc, char **argv){
         errExit("open");
     }
 
-    ssize_t written;
-    int i=1;
-    char buffer[BUFF_TAILLE];
-    while(argv[i]!=NULL){
-        if ( (written = write(fd,argv[i++],BUFF_TAILLE) ) != sizeof(argv[i]) ){
-
-        }
-    }
+    if(write(fd,argv[1],strlen(argv[1])) == -1)
+        errExit("write");
+    close(fd);
 
 
     exit(5);

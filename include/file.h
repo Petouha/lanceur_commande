@@ -46,4 +46,4 @@ char *create_string(int pid_proc, int tube);
 char **analyse_arg(const char arg[]);
 void dispose_arg(char *argv[]);
 
-char **get_command_string(char **argv);
+char **get_command_string(char *argv);

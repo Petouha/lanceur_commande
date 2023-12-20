@@ -111,7 +111,7 @@ char *create_string(int pid_proc, int tube){
     return return_value;
 }
 
-char **get_command_string(char **argv){
+char **get_command_string(char *argv){
     char **anal;
     char result[MAX_STRING_LENGTH] = "";
     // pour séparer les commandes
@@ -119,7 +119,7 @@ char **get_command_string(char **argv){
 
     if (split_components == NULL)
         errExit("malloc");
-    anal = analyse_arg(argv[1]);
+    anal = analyse_arg(argv);
 
     // concaténer le resultat de l'analyse dans une variable
     for (int i = 0; anal[i] != NULL; ++i) {
