@@ -47,3 +47,5 @@ char **analyse_arg(const char arg[]);
 void dispose_arg(char *argv[]);
 
 char **get_command_string(char *argv);
+
+int array_length(char **arr);

@@ -30,13 +30,14 @@ test: client.o file.o
 conso: conso.o file.o
 	$(CC) -o $@ $^ $(CFLAGS)
 
-daemon: daemon.o file.o
+daemon: daemon.o file.o analyse.o
 	$(CC) -o $@ $^ $(CFLAGS)
 
 nsiyi: nsiyi.o file.o analyse.o
 	$(CC) -o $@ $^ $(CFLAGS)
 
-
+client: client.o file.o analyse.o
+	$(CC) -o $@ $^ $(CFLAGS)
 
 clean:
 	rm -f *.o $(BIN) tube*

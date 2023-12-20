@@ -4,15 +4,6 @@
 
 #include "../include/file.h"
 
-int array_length(char **arr) {
-    int length = 0;
-
-    while (arr[length] != NULL) {
-        length++;
-    }
-
-    return length;
-}
 
 
 int main(int argc, char **argv){

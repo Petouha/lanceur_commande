@@ -93,6 +93,8 @@ data_t defiler(file_t *file){
     return return_value;
 }
 
+
+//fonction qui crée le tube nommé
 char *create_string(int pid_proc, int tube){
     char *return_value = malloc(sizeof(char)*256);
     switch (tube) {
@@ -111,6 +113,7 @@ char *create_string(int pid_proc, int tube){
     return return_value;
 }
 
+//fonction qui renvoie un tableau de string contenant les commandes à éxecuter
 char **get_command_string(char *argv){
     char **anal;
     char result[MAX_STRING_LENGTH] = "";
@@ -141,4 +144,14 @@ char **get_command_string(char *argv){
 
 
     return  split_components;
+}
+//je pense que le nom est clair mdrrr
+int array_length(char **arr) {
+    int length = 0;
+
+    while (arr[length] != NULL) {
+        length++;
+    }
+
+    return length;
 }
