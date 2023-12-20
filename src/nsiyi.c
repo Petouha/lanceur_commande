@@ -17,37 +17,45 @@ int main(int argc, char **argv){
         printf("%s\n",argv[i]);
     }
 
-    //char **print = get_command_string(argv[1]);
+    char **print = get_command_string(argv[1]);
+    char **exec;
 
-//    int tubes[array_length(print)][2];
 
-    mkfifo("test",0642);
-    char *buffer[BUFF_TAILLE];
-    switch(fork()){
-        case 0:
-            printf("\n");
-            int fg = open("test",O_RDONLY);
-            if(fg == -1)
-                 errExit("open");
-            ssize_t n=0;
-            while( ( n = read(fg,buffer,BUFF_TAILLE)) > 0){
-                if(write(STDOUT_FILENO,buffer, (size_t ) n) != n)
-                    errExit("write");
-            }
-            close(fg);
-            exit(EXIT_SUCCESS);
+    int tubes[array_length(print)][2];
+    int i;
+    for (i =0; i < array_length(print); ++i) {
+        if(pipe(tubes[i]) == -1)
+            errExit("pipe");
+        switch (fork()) {
+            case 0:
+                //fermer le descripteur ouvert en lecture
+                if (close(tubes[i][0]) == -1)
+                    errExit("close");
 
-        default:
-            printf("\n");
-            int fd = open("test",O_WRONLY);
-            if(fd == -1)
-                errExit("open");
-            if(write(fd,argv[1],strlen(argv[1])) == -1)
-                errExit("write");
-            close(fd);
-            wait(NULL);
+                //si ce n'est pas le dernier processus :sortie devient sur le tube
+                //sinon : garder la sortie du père
+                if (i != array_length(print)-1)
+                    dup2(tubes[i][1],STDOUT_FILENO);
+                if (i > 0){
+                    //entrée devient sur le tube précedent
+                    dup2(tubes[i-1][0], STDIN_FILENO);
+                }
+//                else if (i == array_length(print)-1)
+//                    //
+//                    dup2(tubes[i][0],STDOUT_FILENO);
+
+                exec = analyse_arg(print[i]);
+                execvp(exec[0],exec);
+                errExit("execvp");
+            default:
+                if (close(tubes[i][1]) == -1)
+                    errExit("close");
+
+                wait(NULL);
+                printf("son %d finished\n",i);
+        }
+
     }
-
 
     exit(5);
 
