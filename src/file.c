@@ -129,9 +129,6 @@ char **get_command_string(char *argv){
         strcat(result, anal[i]);
         strcat(result, " ");
     }
-
-    printf("Full result: %s\n", result);
-
     // séparer les commandes par |
     char *parcours = strtok(result, "|");
     int i = 0;
@@ -141,7 +138,6 @@ char **get_command_string(char *argv){
         parcours = strtok(NULL, "|");
         i++;
     }
-
 
     return  split_components;
 }

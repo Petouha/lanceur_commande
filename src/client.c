@@ -10,7 +10,7 @@ int main(int argc, char **argv){
 
     file_t *file = NULL;
     recuperer_file_client(&file);
-
+    char buffer[BUFF_TAILLE];
     //création des tubes
 
     char *fifo_in = create_string(getpid(),STDIN_FILENO);
@@ -37,7 +37,16 @@ int main(int argc, char **argv){
         errExit("write");
     close(fd);
 
+    if( (fd = open(fifo_out,O_RDONLY)) == -1){
+        errExit("open");
+    }
+    ssize_t n;
+    while ((n=read(fd,buffer,BUFF_TAILLE)) > 0){
+        if (write(STDOUT_FILENO,buffer, (size_t) n) < n)
+            errExit("write");
+    }
 
+    close(fd);
     exit(5);
 
 }

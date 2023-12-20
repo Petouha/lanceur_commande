@@ -13,13 +13,14 @@ int main(int argc, char **argv){
         exit(EXIT_FAILURE);
     }
 
-    for (int i = 0; i < argc; ++i) {
-        printf("%s\n",argv[i]);
-    }
+    //execlp("ps","ps aux","|","wc -l",NULL);
 
     char **print = get_command_string(argv[1]);
     char **exec;
 
+    for (int i = 0; i < array_length(print); ++i) {
+        printf("%s\n",print[i]);
+    }
 
     int tubes[array_length(print)][2];
     int i;
@@ -36,13 +37,11 @@ int main(int argc, char **argv){
                 //sinon : garder la sortie du père
                 if (i != array_length(print)-1)
                     dup2(tubes[i][1],STDOUT_FILENO);
+                //sauf pour le 1er proc, tous les tubes :
                 if (i > 0){
                     //entrée devient sur le tube précedent
                     dup2(tubes[i-1][0], STDIN_FILENO);
                 }
-//                else if (i == array_length(print)-1)
-//                    //
-//                    dup2(tubes[i][0],STDOUT_FILENO);
 
                 exec = analyse_arg(print[i]);
                 execvp(exec[0],exec);
@@ -52,9 +51,7 @@ int main(int argc, char **argv){
                     errExit("close");
 
                 wait(NULL);
-                printf("son %d finished\n",i);
         }
-
     }
 
     exit(5);
