@@ -1,9 +1,8 @@
 
-#include "../include/file.h"
+#include <file.h>
 
 
 void * run(void *arg);
-
 int main(){
 
 
@@ -13,18 +12,17 @@ int main(){
 
     //désactiver les signaux
 
-//    sigset_t sigset;
-//
-//    if(sigfillset(&sigset) == -1){
-//        errExit("sigfillset");
-//    }
-//
-//    sigdelset(&sigset,SIGINT);
-//
-//
-//    sigprocmask(SIG_BLOCK,&sigset,NULL);
+    sigset_t sigset;
 
-    //récupérer le pid du proc appelant
+    if(sigfillset(&sigset) == -1){
+        errExit("sigfillset");
+    }
+
+    sigdelset(&sigset,SIGINT);
+
+
+    sigprocmask(SIG_BLOCK,&sigset,NULL);
+
 
     while (1) {
         data_t *data = malloc(sizeof(data_t));  // Allocate a new data instance
@@ -68,7 +66,7 @@ void * run(void *arg){
     if (fd == -1)
         errExit("open stdin");
 
-    char buffer[BUFF_TAILLE];
+    char *buffer = malloc(sizeof(char)*BUFF_TAILLE);
     //lire depuis le tube_in
     while (read(fd,buffer,BUFF_TAILLE) > 0);
 
@@ -81,6 +79,8 @@ void * run(void *arg){
 
     dup2(fd,STDOUT_FILENO);
     close(fd);
+
+
 
     //avoir la liste des commandes
     char **print = get_command_string(buffer);
@@ -118,21 +118,30 @@ void * run(void *arg){
             default:
                 if (close(tubes[i][1]) == -1)
                     errExit("close");
-                printf("fils %d en exec\n",i);
                 waitpid(pid,NULL,0);
 
         }
     }
     //close(fd);
-    free(arg);
+//    free(arg);
+//    free_char_array(print);
+//    for (i = 0; i < array_length(print); ++i) {
+//        close(tubes[i][0]);
+//        close(tubes[i][1]);
+//    }
 
-    for (i = 0; i < array_length(print); ++i) {
-        close(tubes[i][0]);
-        close(tubes[i][1]);
-    }
-    
     close(STDOUT_FILENO);
-    free(print);
-    memset(buffer, '\0', BUFF_TAILLE);
+    free(buffer);
     pthread_exit(NULL);
+}
+
+void free_char_array(char **arr) {
+    if (arr == NULL)
+        return;
+
+    for (int i = 0; arr[i] != NULL; ++i) {
+        free(arr[i]);
+    }
+
+    free(arr);
 }

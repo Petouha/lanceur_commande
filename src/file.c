@@ -16,18 +16,22 @@ void V(sem_t *sem){
     }
 }
 
+//initialise la file pour le démon
 void initialiser_file(file_t **file) {
+    //créer ou réduire la taille du segment de mémoire partagée
     int fd = shm_open(NOM_SHM, O_RDWR | O_CREAT | O_TRUNC, 0642);
     if (fd == -1) {
         perror("shm_open");
         exit(EXIT_FAILURE);
     }
 
+    //défini la taille du SMP
     if (ftruncate(fd, sizeof(file_t)) == -1) {
         perror("ftruncate");
         exit(EXIT_FAILURE);
     }
 
+    //projetté le SHM dans la mémoire du processus
     *file = (file_t *)mmap(NULL, sizeof(file_t), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (*file == MAP_FAILED) {
         perror("mmap");
@@ -39,6 +43,7 @@ void initialiser_file(file_t **file) {
         exit(EXIT_FAILURE);
     }
 
+    //intiliase les sémaphores
     if (sem_init(&((*file)->plein), 1, 0) == -1) {
         perror("sem_init");
         exit(EXIT_FAILURE);
@@ -55,12 +60,15 @@ void initialiser_file(file_t **file) {
     }
 }
 
+
 void recuperer_file_client(file_t **file){
     int fd;
+    //tente d'ouvrir le SHM
     if ( (fd = shm_open(NOM_SHM,O_RDWR,0642)) == -1){
         errExit("shm_open");
     }
 
+    //projettes le SHM dans la variable passée en adresse
     *file = (file_t *) mmap(NULL,sizeof (file_t),PROT_READ | PROT_WRITE,MAP_SHARED,fd,0);
     close(fd);
 
@@ -75,8 +83,6 @@ void enfiler(file_t *file, data_t data){
 
     V(&file->mutex);
     V(&file->plein);
-
-    printf("on a enfilé %d\n", data.pid);
 }
 
 data_t defiler(file_t *file){
@@ -89,7 +95,7 @@ data_t defiler(file_t *file){
 
     V(&file->mutex);
     V(&file->vide);
-    printf("on a défilé %d\n", return_value.pid);
+
     return return_value;
 }
 
@@ -141,7 +147,7 @@ char **get_command_string(char *argv){
 
     return  split_components;
 }
-//je pense que le nom est clair mdrrr
+
 int array_length(char **arr) {
     int length = 0;
 

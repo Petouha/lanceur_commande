@@ -47,12 +47,12 @@ int main(int argc, char **argv){
             errExit("write");
     }
 
+
     unlink(fifo_in);
     unlink(fifo_out);
     unlink(fifo_err);
 
     close(fd);
     exit(EXIT_SUCCESS);
-
 
 }
