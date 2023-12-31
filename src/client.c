@@ -37,6 +37,7 @@ int main(int argc, char **argv){
         errExit("write");
     close(fd);
 
+    //lire du tube fifo_out
     if( (fd = open(fifo_out,O_RDONLY)) == -1){
         errExit("open");
     }
@@ -46,7 +47,12 @@ int main(int argc, char **argv){
             errExit("write");
     }
 
+    unlink(fifo_in);
+    unlink(fifo_out);
+    unlink(fifo_err);
+
     close(fd);
-    exit(5);
+    exit(EXIT_SUCCESS);
+
 
 }

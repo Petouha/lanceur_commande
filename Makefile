@@ -4,7 +4,7 @@ SRC_DIR= ./src
 LIB_DIR= ./lib
 
 FLAGS= -std=c18 -I$(INC_DIR) -Wall -Wpedantic -Wextra -Wconversion -Wwrite-strings -Werror -fstack-protector-all -fpie -pthread -D__USE_XOPEN -D_POSIX_C_SOURCE=200809L -O3
-BIN= file test conso daemon
+BIN= file test conso daemon client nsiyi
 
 OBJ = $(BIN).o
 

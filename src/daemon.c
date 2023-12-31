@@ -11,7 +11,6 @@ int main(){
     file_t *file = NULL;
     initialiser_file(&file);
 
-    data_t data;
     //désactiver les signaux
 
 //    sigset_t sigset;
@@ -26,16 +25,34 @@ int main(){
 //    sigprocmask(SIG_BLOCK,&sigset,NULL);
 
     //récupérer le pid du proc appelant
-    data = defiler(file);
 
-    pthread_t th;
+    while (1) {
+        data_t *data = malloc(sizeof(data_t));  // Allocate a new data instance
+        if (data == NULL)
+            errExit("malloc");
+        printf("avant défiler\n");
+        *data = defiler(file);
+        pthread_t th;
 
-    if(pthread_create(&th,NULL,run,&data) != 0)
-        errExit("pthread_create");
+        printf("thread\n");
 
-    pthread_join(th,NULL);
+        dup2(STDOUT_FILENO,STDOUT_FILENO);
 
+        pthread_attr_t attr;
+        if ((pthread_attr_init(&attr)) != 0)
+            errExit("pthread_attr_init");
+
+        if ((pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED)) != 0)
+            errExit("pthread_attr_setdetachstate");
+        if (pthread_create(&th, &attr, run, data) != 0)
+            errExit("pthread_create");
+
+        pthread_attr_destroy(&attr);
+
+
+    }
     return 0;
+
 }
 
 void * run(void *arg){
@@ -49,7 +66,7 @@ void * run(void *arg){
 
     int fd = open(create_string(data.pid,STDIN_FILENO),O_RDONLY);
     if (fd == -1)
-        errExit("open");
+        errExit("open stdin");
 
     char buffer[BUFF_TAILLE];
     //lire depuis le tube_in
@@ -60,9 +77,10 @@ void * run(void *arg){
     //ouvrir le tube_out
     fd = open(create_string(data.pid,STDOUT_FILENO),O_WRONLY);
     if (fd == -1)
-        errExit("open");
+        errExit("open stdout");
 
     dup2(fd,STDOUT_FILENO);
+    close(fd);
 
     //avoir la liste des commandes
     char **print = get_command_string(buffer);
@@ -71,11 +89,12 @@ void * run(void *arg){
     //les tubes
     int tubes[array_length(print)][2];
     int i;
+    int pid;
     //fork pour éxécuter toutes les commandes
     for (i =0; i < array_length(print); ++i) {
         if(pipe(tubes[i]) == -1)
             errExit("pipe");
-        switch (fork()) {
+        switch (pid = fork()) {
             case 0:
 
                 //fermer le descripteur ouvert en lecture
@@ -92,7 +111,6 @@ void * run(void *arg){
                     //entrée devient sur le tube précedent
                     dup2(tubes[i-1][0], STDIN_FILENO);
                 }
-
                 //récuperer la commande et l'exec
                 exec = analyse_arg(print[i]);
                 execvp(exec[0],exec);
@@ -101,8 +119,20 @@ void * run(void *arg){
                 if (close(tubes[i][1]) == -1)
                     errExit("close");
                 printf("fils %d en exec\n",i);
-                wait(NULL);
+                waitpid(pid,NULL,0);
+
         }
     }
+    //close(fd);
+    free(arg);
+
+    for (i = 0; i < array_length(print); ++i) {
+        close(tubes[i][0]);
+        close(tubes[i][1]);
+    }
+    
+    close(STDOUT_FILENO);
+    free(print);
+    memset(buffer, '\0', BUFF_TAILLE);
     pthread_exit(NULL);
 }
