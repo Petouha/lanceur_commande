@@ -17,10 +17,6 @@ int main(){
     if(sigfillset(&sigset) == -1){
         errExit("sigfillset");
     }
-
-    sigdelset(&sigset,SIGINT);
-
-
     sigprocmask(SIG_BLOCK,&sigset,NULL);
 
 
